@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle do Motor</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 30px; background: #2b2121; color: #fff; }
+    button { padding: 10px 20px; margin: 6px; }
+    input[type="range"] { width: 300px; }
+  </style>
+</head>
+<body>
+  <h1>Controle do Motor</h1>
+
+  <!-- Botões -->
+  <button onclick="enviarComando('conectar')">Conectar</button>
+  <button onclick="enviarComando('girar')">Girar</button>
+  <button onclick="enviarComando('parar')">Parar</button>
+
+  <br><br>
+
+  <!-- Input de texto -->
+  <input id="msginput" type="text" placeholder="mensagem" />
+  <button onclick="enviarMensagem()">Enviar</button>
+
+  <br><br>
+
+  <label for="velSlider">Velocidade:</label>
+  <input id="velSlider" type="range" min="0" max="255" value="200" oninput="atualizarVel(this.value)" />
+  <span id="velValue">200</span>
+
+  <p id="status">Status: Desconhecido</p>
+
+  <script>
+    // conecta ao servidor Socket.IO (mesmo host)
+    const socket = io();
+
+    // eventos de conexão / resposta do servidor
+    socket.on('connect', () => {
+      console.log('Conectado ao servidor Socket.IO');
+      document.getElementById('status').textContent = 'Status: Conectado';
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Desconectado do servidor');
+      document.getElementById('status').textContent = 'Status: Desconectado';
+    });
+
+    // receber respostas do servidor
+    socket.on('resposta', (msg) => {
+      console.log('Resposta do servidor:', msg);
+    });
+
+    // manda comandos genéricos ao servidor
+    function enviarComando(cmd) {
+      // enviamos um evento "comando" com o dado cmd
+      socket.emit('comando', cmd);
+      console.log('Enviado comando:', cmd);
+    }
+
+    // envia mensagem de chat
+    function enviarMensagem() {
+      const input = document.getElementById('msginput'); // id fixado
+      const texto = input.value.trim();
+      if (!texto) return;
+      socket.emit('mensagem', texto);
+      input.value = '';
+    }
+
+    // velocidade via 'comando'
+    function atualizarVel(valor) {
+      document.getElementById('velValue').textContent = valor;
+      enviarComando('velocidade:' + valor);
+    }
+  </script>
+</body>
+</html>
