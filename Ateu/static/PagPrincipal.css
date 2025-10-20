@@ -2,4 +2,21 @@ body{
     background-color: rgb(31, 31, 31);
     color: white;
     font-family: 'Inter', sans-serif;
+    padding: 0px;
+    margin: 1%;
+}
+
+body a {
+    color: white;
+    text-decoration: none;
+}
+
+footer {
+    background-color: rgb(85, 85, 85);
+    border-radius: solid 1px rgb(255, 255, 255);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    left: 0px;
 }

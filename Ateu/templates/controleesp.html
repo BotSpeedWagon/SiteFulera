@@ -2,25 +2,62 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Controle do Motor</title>
+  <h1 class="text-center">Simple Flask App</h1>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 30px; background: #2b2121; color: #fff; }
-    button { padding: 10px 20px; margin: 6px; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: rgb(31, 31, 31);
+      color: white;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: rgb(255, 255, 255);
+      margin: 6px;
+      border-radius: 5px;
+      border: 1px solid rgb(255, 255, 255);
+      cursor: pointer;
+    }
+
+    button:active {
+      background-color: rgb(240, 240, 240);
+      border: 1px solid rgb(240, 240, 240);
+    }
+    
     input[type="range"] { width: 300px; }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      background-color: gray;
+      margin: 0px;
+      padding: 0px;
+    }
+    
+    footer a {
+      color: white;
+      text-decoration: none;
+    }
+
   </style>
 </head>
 <body>
   <h1>Controle do Motor</h1>
 
-  <!-- Botões -->
-  <button onclick="enviarComando('conectar')">Conectar</button>
-  <button onclick="enviarComando('girar')">Girar</button>
-  <button onclick="enviarComando('parar')">Parar</button>
+  <div>
+    <button onclick="enviarComando('conectar')">Conectar</button>
+    <button onclick="enviarComando('girar')">Girar</button>
+    <button onclick="enviarComando('parar')">Parar</button>
+  </div>
 
   <br><br>
 
-  <!-- Input de texto -->
   <input id="msginput" type="text" placeholder="mensagem" />
   <button onclick="enviarMensagem()">Enviar</button>
 
@@ -32,11 +69,14 @@
 
   <p id="status">Status: Desconhecido</p>
 
-  <script>
-    // conecta ao servidor Socket.IO (mesmo host)
-    const socket = io();
+  <footer>
+      <p><a href="/">Home</p>
+  </footer>
 
-    // eventos de conexão / resposta do servidor
+  <script>
+
+    const socket = io();
+    
     socket.on('connect', () => {
       console.log('Conectado ao servidor Socket.IO');
       document.getElementById('status').textContent = 'Status: Conectado';
@@ -47,19 +87,17 @@
       document.getElementById('status').textContent = 'Status: Desconectado';
     });
 
-    // receber respostas do servidor
     socket.on('resposta', (msg) => {
       console.log('Resposta do servidor:', msg);
     });
 
-    // manda comandos genéricos ao servidor
+
     function enviarComando(cmd) {
-      // enviamos um evento "comando" com o dado cmd
       socket.emit('comando', cmd);
       console.log('Enviado comando:', cmd);
     }
 
-    // envia mensagem de chat
+
     function enviarMensagem() {
       const input = document.getElementById('msginput'); // id fixado
       const texto = input.value.trim();
@@ -68,11 +106,14 @@
       input.value = '';
     }
 
-    // velocidade via 'comando'
     function atualizarVel(valor) {
       document.getElementById('velValue').textContent = valor;
       enviarComando('velocidade:' + valor);
     }
+
+
+
+    
   </script>
 </body>
 </html>
