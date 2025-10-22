@@ -2,49 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='CtrlESP.css') }}">
   <h1 class="text-center">Simple Flask App</h1>
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: rgb(31, 31, 31);
-      color: white;
-      margin: 0px;
-      padding: 0px;
-    }
-
-    button {
-      padding: 10px 20px;
-      background-color: rgb(255, 255, 255);
-      margin: 6px;
-      border-radius: 5px;
-      border: 1px solid rgb(255, 255, 255);
-      cursor: pointer;
-    }
-
-    button:active {
-      background-color: rgb(240, 240, 240);
-      border: 1px solid rgb(240, 240, 240);
-    }
-    
     input[type="range"] { width: 300px; }
-
-    footer {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      text-align: center;
-      background-color: gray;
-      margin: 0px;
-      padding: 0px;
-    }
-    
-    footer a {
-      color: white;
-      text-decoration: none;
-    }
-
   </style>
 </head>
 <body>
@@ -75,42 +37,19 @@
 
   <script>
 
-    const socket = io();
-    
-    socket.on('connect', () => {
-      console.log('Conectado ao servidor Socket.IO');
-      document.getElementById('status').textContent = 'Status: Conectado';
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Desconectado do servidor');
-      document.getElementById('status').textContent = 'Status: Desconectado';
-    });
-
-    socket.on('resposta', (msg) => {
-      console.log('Resposta do servidor:', msg);
-    });
-
-
-    function enviarComando(cmd) {
-      socket.emit('comando', cmd);
-      console.log('Enviado comando:', cmd);
-    }
-
-
-    function enviarMensagem() {
-      const input = document.getElementById('msginput'); // id fixado
-      const texto = input.value.trim();
-      if (!texto) return;
-      socket.emit('mensagem', texto);
-      input.value = '';
-    }
-
-    function atualizarVel(valor) {
-      document.getElementById('velValue').textContent = valor;
-      enviarComando('velocidade:' + valor);
-    }
-
+    function enviarComando(comando){
+      fetch("/comandoesp", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `comando=${comando}`
+      })}
+    function enviarMensagem(){
+      const mensagem = document.getElementById("msginput").value;
+      fetch("/mensagemesp", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `mensagem=${mensagem}`
+      })}
 
 
     
