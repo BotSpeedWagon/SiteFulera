@@ -4,6 +4,8 @@ body{
     font-family: 'Inter', sans-serif;
     padding: 0px;
     margin-left: 0%;
+    padding-top: 80px;
+    padding-bottom: 40px;
 }
 
 div.header {
@@ -13,24 +15,35 @@ div.header {
     width: 100%;
     text-align: center;
     left: 0px;
-    margin-bottom: 1px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.header p {
+    font-size: 5px;
 }
 
 body a {
-    margin-top: 3%;
+    margin-top: 1px;
+    margin-left: 0.5%;
+    margin-right: 90%;
     color: white;
     text-decoration: none;
-    display: block;
-
+    font-size: larger;
+    display: table;
 }
 
 footer {
     background-color: rgb(85, 85, 85);
-    border-radius: solid 1px rgb(255, 255, 255);
     position: fixed;
     bottom: 0;
     width: 100%;
     text-align: center;
-    left: 0px;
-    margin-top: 1px;
+    left: 0;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

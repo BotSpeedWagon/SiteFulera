@@ -3,56 +3,165 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="stylesheet" href="{{ url_for('static', filename='CtrlESP.css') }}">
-  <h1 class="text-center">Simple Flask App</h1>
+  <h1 class="text-center">Controle da Esp</h1>
 
   <style>
-    input[type="range"] { width: 300px; }
+    input[type="range"] { width: 500px; }
+
+    .main-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .camera {
+      flex: 0 0 500px;
+    }
+
+    .camera img {
+      width: 100%;
+      border: 2px solid #333;
+      border-radius: 10px;
+    }
+
+    .controls {
+      flex: 1;
+    }
+
+    label {
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h1>Controle do Motor</h1>
 
-  <div>
-    <button onclick="enviarComando('conectar')">Conectar</button>
-    <button onclick="enviarComando('girar')">Girar</button>
-    <button onclick="enviarComando('parar')">Parar</button>
+  <div class="main-container">
+
+
+
+
+
+    <div class="camera">
+      <h2>Visualização à Distância</h2>
+      <img src="{{ url_for('video_feed') }}" alt="Webcam ao vivo">
+    </div>
+
+
+    <div class="controls">
+      <h1>Controle do Wxperimento</h1>
+
+      <div>
+        <button onclick="enviarComando('conectar')">Conectar</button>
+        <button onclick="iniciarExperimento()">Iniciar Experimento</button>
+        <button onclick="pararExperimento()">Parar</button>
+      </div>
+
+      <br><br>
+      <label for="tempoSlider">Tempo de Experimento (s):</label><br>
+      <input id="tempoSlider" type="range" min="0" max="120" step="5" value="60" oninput="atualizarTempo(this.value)" />
+      <span id="tempoValue">60 s</span>
+
+      <br><br>
+
+
+      <label for="tensaoSlider">Tensão IRLB3034 (V):</label><br>
+      <input id="tensaoSlider" type="range" min="0" max="12" step="0.1" value="0" oninput="atualizarTensao(this.value)" />
+      <span id="tensaoValue">0.0 V</span>
+
+      <p id="status">Status: aguardando comando</p>
+
+      <footer>
+          <p><a href="/">Home</a></p>
+      </footer>
+    </div>
   </div>
 
-  <br><br>
-
-  <input id="msginput" type="text" placeholder="mensagem" />
-  <button onclick="enviarMensagem()">Enviar</button>
-
-  <br><br>
-
-  <label for="velSlider">Velocidade:</label>
-  <input id="velSlider" type="range" min="0" max="255" value="200" oninput="atualizarVel(this.value)" />
-  <span id="velValue">200</span>
-
-  <p id="status">Status: Desconhecido</p>
-
-  <footer>
-      <p><a href="/">Home</p>
-  </footer>
 
   <script>
-
-    function enviarComando(comando){
+    let intervaloContador = null;
+    function enviarComando(comando) {
       fetch("/comandoesp", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `comando=${comando}`
-      })}
-    function enviarMensagem(){
-      const mensagem = document.getElementById("msginput").value;
-      fetch("/mensagemesp", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `mensagem=${mensagem}`
-      })}
+        body: "comando=" + comando
+      });
+    }
+
+
+
+
 
 
     
+    function atualizarTensao(valor) {
+      document.getElementById("tensaoValue").textContent = valor + " V";
+    }
+
+    function atualizarTempo(valor) {
+      document.getElementById("tempoValue").textContent = valor + " s";
+    }
+
+    async function iniciarExperimento() {
+      const tempo = parseInt(document.getElementById("tempoSlider").value);
+      const tensao = parseFloat(document.getElementById("tensaoSlider").value);
+      const statusEl = document.getElementById("status");
+
+      statusEl.textContent = `Iniciando experimento (${tempo}s a ${tensao}V)...`;
+
+      const dados = new URLSearchParams();
+      dados.append("comando", `INICIAR:${tempo}:${tensao}`);
+
+      try {
+        const resposta = await fetch("/comandoesp", {
+          method: "POST",
+          body: dados
+        });
+        const texto = await resposta.text();
+        console.log(texto);
+
+        iniciarContador(tempo);
+      } catch (erro) {
+        console.error("Erro ao enviar comando:", erro);
+        statusEl.textContent = "Erro ao iniciar experimento.";
+      }
+    }
+
+    function iniciarContador(segundos) {
+      const statusEl = document.getElementById("status");
+      let tempoRestante = segundos;
+
+ 
+      if (intervaloContador) {
+        clearInterval(intervaloContador);
+      }
+
+      statusEl.textContent = `Experimento em andamento... ${tempoRestante}s restantes`;
+
+      intervaloContador = setInterval(() => {
+        tempoRestante--;
+        if (tempoRestante > 0) {
+          statusEl.textContent = `Experimento em andamento... ${tempoRestante}s restantes`;
+        } else {
+          clearInterval(intervaloContador);
+          intervaloContador = null;
+          statusEl.textContent = "Experimento finalizado!";
+        }
+      }, 1000);
+    }
+
+
+
+
+    
+    function pararExperimento() {
+      if (intervaloContador) {
+        clearInterval(intervaloContador);
+        intervaloContador = null;
+      }
+      document.getElementById("status").textContent = "Experimento interrompido manualmente.";
+      enviarComando("parar");
+    }
   </script>
+
 </body>
 </html>

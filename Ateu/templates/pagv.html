@@ -1,16 +1,15 @@
-  <style>
-    body {
-      background-color: rgb(34, 34, 34);
-      color: rgb(255, 255, 255);
-    }
-  </style>
-  <h1 class="text-center">Simple Flask App</h1>
-  <div class="row">
-    <div class="col-sm-6 offset-sm-3">
-      <div class="jumbotron">
-        Em desenvolvimento <a
-           href="https://www.leagueofgraphs.com/summoner/br/Philipy2005-2005">Troll</a>.
-      </div>
-    </div>
-  </div>
-  
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Webcam ao vivo</title>
+    <style>
+        body { background: #111; color: #fff; text-align: center; }
+        img { width: 80%; border: 2px solid #333; border-radius: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Transmissão da Webcam</h1>
+    <img src="{{ url_for('video_feed') }}" alt="Webcam ao vivo">
+</body>
+</html>
